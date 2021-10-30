@@ -5,6 +5,7 @@
 
 + [Настройка интерфейса USART](#USART)
 
++ [Настройка записи и чтения EEPROM](#EEPROM)
 
 ## <a name="Timer"></a>	**Настройка 8/16 битного таймера/счетчика**
 
@@ -145,4 +146,28 @@ F - частота кварца
 		while (!(UCSR0A & (1 << UDRE0)));
 		UDR0 = data[i];
 	    }
+    }
+
+
+## <a name="EEPROM"></a>	**Настройка записи и чтения EEPROM**
+
+#### ***Чтение***
+
+    unsigned char EEPROM_read(unsigned int uiAddress)
+    {
+        while(EECR & (1<<EEPE)); // ожидание завершения предыдущей записи
+        EEAR = uiAddress;
+        EECR |= (1<<EERE); // чтение
+        return EEDR;
+    }
+
+#### ***Запись***
+
+    void EEPROM_write(unsigned int uiAddress, unsigned char ucData)
+    {
+        while(EECR & (1<<EEPE));
+        EEAR = uiAddress;
+        EEDR = ucData;
+        EECR |= (1<<EEMPE);
+        EECR |= (1<<EEPE); //запись
     }
